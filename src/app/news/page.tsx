@@ -21,10 +21,12 @@ export default function NewsPage() {
   const [news, setNews] = useState<NewsItem[]>([]);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
+  const [expanded, setExpanded] = useState<number | null>(null);
 
   useEffect(() => {
     setLoading(true);
     setError(null);
+    setExpanded(null);
     fetch(`/api/news?symbol=${selected}`)
       .then((r) => r.json())
       .then((data) => {
@@ -48,7 +50,7 @@ export default function NewsPage() {
           ข่าวบริษัทจาก Finnhub (14 วันล่าสุด) · แปลไทยอัตโนมัติ
         </p>
         <p className="text-xs text-slate-500 mt-1">
-          Company news from Finnhub · Auto-translated to Thai
+          อ่านสรุปในแอปอย่างเดียว ไม่เปิดลิงก์ภายนอก
         </p>
       </header>
 
@@ -90,46 +92,56 @@ export default function NewsPage() {
       ) : news.length === 0 ? (
         <p className="text-slate-500">ไม่พบข่าวล่าสุดของ {selected}</p>
       ) : (
-        <div className="space-y-5">
-          {news.map((item) => (
-            <a
-              key={item.id}
-              href={item.url}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="block rounded-xl border border-slate-800 bg-slate-900/60 p-5 hover:border-slate-600 transition"
-            >
-              {/* Thai headline (main) */}
-              <h3 className="text-lg font-medium text-white leading-snug">
-                {item.headlineTh || item.headline}
-              </h3>
+        <div className="space-y-4">
+          {news.map((item) => {
+            const isOpen = expanded === item.id;
+            return (
+              <div
+                key={item.id}
+                onClick={() => setExpanded(isOpen ? null : item.id)}
+                className="rounded-xl border border-slate-800 bg-slate-900/60 p-5 cursor-pointer hover:border-slate-600 transition"
+              >
+                {/* Thai headline */}
+                <h3 className="text-lg font-medium text-white leading-snug">
+                  {item.headlineTh || item.headline}
+                </h3>
 
-              {/* English headline (secondary) */}
-              {item.headlineTh && item.headlineTh !== item.headline && (
-                <p className="text-sm text-slate-500 mt-1 leading-snug">
-                  {item.headline}
-                </p>
-              )}
+                {/* English headline */}
+                {item.headlineTh && item.headlineTh !== item.headline && (
+                  <p className="text-sm text-slate-500 mt-1 leading-snug">
+                    {item.headline}
+                  </p>
+                )}
 
-              {/* Thai summary */}
-              {(item.summaryTh || item.summary) && (
-                <p className="text-sm text-slate-300 mt-3 line-clamp-3">
-                  {item.summaryTh || item.summary}
-                </p>
-              )}
+                {/* Summary - show more when expanded */}
+                {(item.summaryTh || item.summary) && (
+                  <p
+                    className={`text-sm text-slate-300 mt-3 ${
+                      isOpen ? "" : "line-clamp-2"
+                    }`}
+                  >
+                    {item.summaryTh || item.summary}
+                  </p>
+                )}
 
-              <div className="flex items-center gap-3 mt-3 text-xs text-slate-500">
-                <span>{item.source}</span>
-                <span>·</span>
-                <span>
-                  {new Date(item.datetime * 1000).toLocaleString("th-TH", {
-                    dateStyle: "medium",
-                    timeStyle: "short",
-                  })}
-                </span>
+                <div className="flex items-center justify-between mt-3">
+                  <div className="flex items-center gap-3 text-xs text-slate-500">
+                    <span>{item.source}</span>
+                    <span>·</span>
+                    <span>
+                      {new Date(item.datetime * 1000).toLocaleString("th-TH", {
+                        dateStyle: "medium",
+                        timeStyle: "short",
+                      })}
+                    </span>
+                  </div>
+                  <span className="text-xs text-indigo-400">
+                    {isOpen ? "ย่อ ▲" : "อ่านเพิ่ม ▼"}
+                  </span>
+                </div>
               </div>
-            </a>
-          ))}
+            );
+          })}
         </div>
       )}
     </main>
