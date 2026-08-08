@@ -1,5 +1,18 @@
 export type Signal = "Buy" | "Hold" | "Sell";
 
+export type TradePlan = {
+  preEarningsTh: string;
+  preEarnings: string;
+  postEarningsTh: string;
+  postEarnings: string;
+  stopTh: string;
+  stop: string;
+  takeProfitTh: string;
+  takeProfit: string;
+  notesTh: string;
+  notes: string;
+};
+
 export type Stock = {
   symbol: string;
   name: string;
@@ -19,8 +32,9 @@ export type Stock = {
   riskLevel: "Low" | "Medium" | "High";
   positionSize: string;
   positionSizeTh: string;
-  impliedMove: string;       // approximate expected move
+  impliedMove: string;
   impliedMoveTh: string;
+  plan: TradePlan;
 };
 
 export const STOCKS: Stock[] = [
@@ -45,6 +59,25 @@ export const STOCKS: Stock[] = [
     positionSizeTh: "1-2% ของทุน",
     impliedMove: "~18-25%",
     impliedMoveTh: "ประมาณ 18-25%",
+    plan: {
+      preEarningsTh:
+        "ถ้าทน gap ได้: สะสมเล็กน้อยระหว่างวันจันทร์ ไม่เกิน 50% ของ size ที่ตั้งไว้ ก่อนปิดตลาด",
+      preEarnings:
+        "If you accept gap risk: scale in lightly Monday session, max 50% of planned size before close.",
+      postEarningsTh:
+        "รอเปิดอังคาร ถ้า gap ขึ้น + volume สูง (RVOL > 1.5x) ค่อยเพิ่มอีก 50% | ถ้า gap ลงแรง ให้รอย่อแล้วดูว่ามีแรงซื้อคืนหรือไม่ ก่อนตัดสินใจ",
+      postEarnings:
+        "Wait for Tuesday open. Add only if gap-up + strong volume (RVOL > 1.5x). If hard gap-down, wait for reclaim before considering entry.",
+      stopTh:
+        "ตัดขาดทุนถ้าราคาปิดต่ำกว่าราคาเข้า ~8–10% หรือต่ำกว่า low วันก่อน earnings อย่างชัดเจน",
+      stop: "Cut if price closes ~8–10% below entry or decisively under pre-earnings day low.",
+      takeProfitTh:
+        "ขาย 1/3 ที่ +10–12% | อีก 1/3 ที่ +18–20% | ที่เหลือปล่อยตามแรง squeeze แต่Trailing ถ้า volume เริ่มเบา",
+      takeProfit:
+        "Scale: 1/3 at +10–12%, 1/3 at +18–20%, runner with trail if volume fades.",
+      notesTh: "ตัวหลักของสัปดาห์ — โฟกัส confirmation หลัง earnings มากกว่ารีบเข้าก่อน",
+      notes: "Primary name this week — prefer post-earnings confirmation over aggressive pre-load.",
+    },
   },
   {
     symbol: "RKLB",
@@ -67,6 +100,21 @@ export const STOCKS: Stock[] = [
     positionSizeTh: "2-3% ของทุน",
     impliedMove: "~12-18%",
     impliedMoveTh: "ประมาณ 12-18%",
+    plan: {
+      preEarningsTh:
+        "เข้าได้เล็กน้อยวันจันทร์ถ้าโมเมนตัม Space ยังดี ไม่ควรเต็ม size ก่อนข่าว",
+      preEarnings: "Light pre-earnings add only if space tape is strong. Do not go full size before the print.",
+      postEarningsTh:
+        "ถ้า earnings ดี + เปิดขึ้น ให้เข้า/เพิ่มตามแรง volume | ถ้าเปิดลง ให้รอ reclaim ระดับก่อน earnings",
+      postEarnings:
+        "If strong report + gap-up, enter/add on volume. If gap-down, wait for reclaim of pre-earnings level.",
+      stopTh: "ตัดที่ประมาณ -6 ถึง -8% จากจุดเข้า หรือต่ำกว่า low วัน reaction",
+      stop: "Stop around -6% to -8% from entry or under reaction-day low.",
+      takeProfitTh: "ขายบางส่วนที่ +8–10% และ +14–16% ที่เหลือ trailing",
+      takeProfit: "Partial at +8–10% and +14–16%, trail the rest.",
+      notesTh: "เล่น momentum + catalyst มากกว่า pure squeeze",
+      notes: "More momentum/catalyst than pure squeeze.",
+    },
   },
   {
     symbol: "LITE",
@@ -89,6 +137,20 @@ export const STOCKS: Stock[] = [
     positionSizeTh: "1-2% ของทุน",
     impliedMove: "~10-15%",
     impliedMoveTh: "ประมาณ 10-15%",
+    plan: {
+      preEarningsTh: "ไม่แนะนำเข้าหนักก่อน earnings — รอผลก่อน",
+      preEarnings: "Avoid heavy pre-earnings exposure — wait for the print.",
+      postEarningsTh:
+        "เข้าได้ถ้าเปิดขึ้นแรง + volume ยืนยัน และราคาไม่ถูกทุบกลับทันที",
+      postEarnings:
+        "Enter only on strong gap-up with sustained volume and no instant rejection.",
+      stopTh: "ตัดที่ -5 ถึง -7% จากจุดเข้า",
+      stop: "Stop roughly -5% to -7% from entry.",
+      takeProfitTh: "เป้าแรก +8–10% เป้าสอง +13–15%",
+      takeProfit: "First target +8–10%, second +13–15%.",
+      notesTh: "เป็น HOLD จนกว่า reaction จะชัด",
+      notes: "Stay HOLD until reaction is clear.",
+    },
   },
   {
     symbol: "CRWV",
@@ -111,6 +173,20 @@ export const STOCKS: Stock[] = [
     positionSizeTh: "0.5-1.5% ของทุน",
     impliedMove: "~15-22%",
     impliedMoveTh: "ประมาณ 15-22%",
+    plan: {
+      preEarningsTh: "ไม่เข้าก่อนข่าว — ผันผวนสูงเกินไป",
+      preEarnings: "No pre-earnings entry — too volatile.",
+      postEarningsTh:
+        "รอทิศทางชัดหลังเปิด อังคาร/พุธ ถ้าขึ้นพร้อม volume ค่อยเข้า size เล็ก",
+      postEarnings:
+        "Wait for clear direction after the open. Only small size if upside holds with volume.",
+      stopTh: "ตัดเร็วที่ประมาณ -7 ถึง -9%",
+      stop: "Tight-ish stop around -7% to -9%.",
+      takeProfitTh: "ขายเร็วเป็นส่วนๆ ที่ +10% และ +16%+",
+      takeProfit: "Scale quickly at +10% and +16%+.",
+      notesTh: "SI สูงแต่ต้องมี confirmation เท่านั้น",
+      notes: "High SI only works with confirmation.",
+    },
   },
   {
     symbol: "SMCI",
@@ -133,6 +209,18 @@ export const STOCKS: Stock[] = [
     positionSizeTh: "1% ของทุน",
     impliedMove: "~12-20%",
     impliedMoveTh: "ประมาณ 12-20%",
+    plan: {
+      preEarningsTh: "ไม่แนะนำเข้าก่อน earnings",
+      preEarnings: "Avoid pre-earnings entry.",
+      postEarningsTh: "เข้าเฉพาะถ้า reaction ขึ้นชัดและถือระดับได้ในช่วงแรกหลังเปิด",
+      postEarnings: "Only if upside reaction holds in the first part of the session.",
+      stopTh: "ตัดที่ประมาณ -6 ถึง -8%",
+      stop: "Stop around -6% to -8%.",
+      takeProfitTh: "เป้า +9–12% และ +15%+",
+      takeProfit: "Targets +9–12% and +15%+.",
+      notesTh: "Size เล็กเสมอ เพราะเหวี่ยงแรง",
+      notes: "Keep size small due to swings.",
+    },
   },
   {
     symbol: "COHR",
@@ -155,6 +243,18 @@ export const STOCKS: Stock[] = [
     positionSizeTh: "1-2% ของทุน",
     impliedMove: "~9-14%",
     impliedMoveTh: "ประมาณ 9-14%",
+    plan: {
+      preEarningsTh: "รอผ่าน CPI วันพุธก่อน แล้วค่อยดู earnings",
+      preEarnings: "Wait for Wednesday CPI first, then earnings reaction.",
+      postEarningsTh: "เข้าได้ถ้าทั้ง CPI และ earnings ไม่กดตลาด และหุ้นมีแรงซื้อ",
+      postEarnings: "Enter only if CPI + earnings do not pressure the tape and buyers show up.",
+      stopTh: "ตัดที่ประมาณ -5 ถึง -7%",
+      stop: "Stop around -5% to -7%.",
+      takeProfitTh: "เป้า +7–10% และ +12–14%",
+      takeProfit: "Targets +7–10% and +12–14%.",
+      notesTh: "เป็นตัวรอง หลัง ASTS/RKLB",
+      notes: "Secondary name after ASTS/RKLB.",
+    },
   },
 ];
 

@@ -6,10 +6,7 @@ import type { CardView } from "./ViewToggle";
 
 type Quote = {
   price?: number;
-  change?: number;
   percent?: number;
-  volume?: number | null;
-  avgVolume?: number | null;
   relativeVolume?: number | null;
 };
 
@@ -121,12 +118,24 @@ function RiskRing({ level }: { level: "Low" | "Medium" | "High" }) {
           strokeLinecap="round"
           strokeDasharray={c}
           strokeDashoffset={offset}
-          style={{ transition: "stroke-dashoffset 0.8s ease" }}
         />
       </svg>
       <span className="text-[10px] font-medium" style={{ color }}>
         Risk {label}
       </span>
+    </div>
+  );
+}
+
+function PlanRow({ title, body }: { title: string; body: string }) {
+  return (
+    <div className="space-y-1">
+      <p className="text-[11px] font-semibold tracking-wide uppercase" style={{ color: "var(--accent)" }}>
+        {title}
+      </p>
+      <p className="text-[13px] leading-relaxed" style={{ color: "var(--text-secondary)" }}>
+        {body}
+      </p>
     </div>
   );
 }
@@ -140,6 +149,7 @@ export default function StockCard({
 }) {
   const [quote, setQuote] = useState<Quote | null>(null);
   const [loading, setLoading] = useState(true);
+  const [open, setOpen] = useState(false);
 
   useEffect(() => {
     fetch(`/api/quote?symbol=${stock.symbol}`)
@@ -165,15 +175,15 @@ export default function StockCard({
       : 12;
 
   return (
-    <article className="card-premium p-5 flex flex-col h-full">
-      {/* Header - shared */}
+    <article
+      className="card-premium p-5 flex flex-col h-full cursor-pointer"
+      onClick={() => setOpen((v) => !v)}
+    >
+      {/* Header */}
       <div className="flex items-start justify-between gap-3 mb-4">
         <div className="min-w-0">
           <div className="flex items-center gap-2 mb-0.5">
-            <h3
-              className="text-[15px] font-semibold tracking-tight truncate"
-              style={{ color: "var(--text-primary)" }}
-            >
+            <h3 className="text-[15px] font-semibold tracking-tight truncate" style={{ color: "var(--text-primary)" }}>
               {stock.symbol}
             </h3>
             <span className="text-[10px] font-medium tabular-nums" style={{ color: "var(--text-muted)" }}>
@@ -190,10 +200,7 @@ export default function StockCard({
             <div className="h-5 w-16 animate-pulse rounded" style={{ background: "var(--surface)" }} />
           ) : quote?.price ? (
             <>
-              <p
-                className="text-[17px] font-semibold tabular-nums tracking-tight"
-                style={{ color: "var(--text-primary)" }}
-              >
+              <p className="text-[17px] font-semibold tabular-nums tracking-tight" style={{ color: "var(--text-primary)" }}>
                 ${quote.price.toFixed(2)}
               </p>
               <p
@@ -210,26 +217,18 @@ export default function StockCard({
         </div>
       </div>
 
-      {/* ========== VISUAL MODE ========== */}
+      {/* Visual mode */}
       {view === "visual" && (
         <>
           <div className="flex items-center justify-between mb-4">
             <SignalBadge signal={stock.signal} />
             <RiskRing level={stock.riskLevel} />
           </div>
-
           <p className="text-[13px] leading-relaxed mb-5 line-clamp-2" style={{ color: "var(--text-secondary)" }}>
             {stock.signalReasonTh}
           </p>
-
           <div className="space-y-3.5 mb-5">
-            <Meter
-              label="Short Interest"
-              value={stock.shortInterest}
-              max={30}
-              color="var(--warning)"
-              display={`${stock.shortInterest}%`}
-            />
+            <Meter label="Short Interest" value={stock.shortInterest} max={30} color="var(--warning)" display={`${stock.shortInterest}%`} />
             <Meter
               label="Relative Volume"
               value={Math.min(rvol || 0, 5)}
@@ -237,28 +236,20 @@ export default function StockCard({
               color={rvol >= 2 ? "var(--positive)" : rvol >= 1.5 ? "var(--warning)" : "var(--text-muted)"}
               display={rvol ? `${rvol.toFixed(1)}x` : "—"}
             />
-            <Meter
-              label="Implied Move"
-              value={impMid}
-              max={30}
-              color="var(--accent)"
-              display={stock.impliedMove}
-            />
+            <Meter label="Implied Move" value={impMid} max={30} color="var(--accent)" display={stock.impliedMove} />
           </div>
         </>
       )}
 
-      {/* ========== CLASSIC MODE ========== */}
+      {/* Classic mode */}
       {view === "classic" && (
         <>
           <div className="mb-3">
             <SignalBadge signal={stock.signal} />
           </div>
-
           <p className="text-[13px] leading-relaxed mb-4 line-clamp-2" style={{ color: "var(--text-secondary)" }}>
             {stock.signalReasonTh}
           </p>
-
           <div className="grid grid-cols-3 gap-2 mb-4">
             {[
               { label: "Short %", value: `${stock.shortInterest}%`, color: "var(--warning)" },
@@ -302,7 +293,7 @@ export default function StockCard({
         </>
       )}
 
-      {/* Footer - shared */}
+      {/* Footer */}
       <div
         className="mt-auto pt-3 flex items-center justify-between text-[11px]"
         style={{ borderTop: "1px solid var(--border)" }}
@@ -315,10 +306,39 @@ export default function StockCard({
           <span style={{ color: "var(--text-muted)" }}>·</span>
           <span style={{ color: "var(--text-muted)" }}>DTC {stock.daysToCover}</span>
         </div>
-        <span className="font-medium" style={{ color: "var(--text-primary)" }}>
-          {stock.positionSizeTh}
+        <span className="font-medium" style={{ color: open ? "var(--accent)" : "var(--text-primary)" }}>
+          {open ? "ปิดแผน ▲" : "ดูแผนเทรด ▼"}
         </span>
       </div>
+
+      {/* Expanded Trade Plan */}
+      {open && (
+        <div
+          className="mt-4 pt-4 space-y-4"
+          style={{ borderTop: "1px solid var(--border)" }}
+          onClick={(e) => e.stopPropagation()}
+        >
+          <p className="text-[12px] font-semibold tracking-wide uppercase" style={{ color: "var(--text-primary)" }}>
+            แผนเทรด · {stock.symbol}
+          </p>
+
+          <PlanRow title="ก่อน Earnings" body={stock.plan.preEarningsTh} />
+          <PlanRow title="หลัง Earnings" body={stock.plan.postEarningsTh} />
+          <PlanRow title="จุดตัดขาดทุน (Stop)" body={stock.plan.stopTh} />
+          <PlanRow title="เป้าทำกำไร (Take Profit)" body={stock.plan.takeProfitTh} />
+
+          <div
+            className="rounded-xl px-3 py-2.5 text-[12px]"
+            style={{ background: "var(--accent-soft)", color: "var(--text-secondary)" }}
+          >
+            {stock.plan.notesTh}
+          </div>
+
+          <p className="text-[11px]" style={{ color: "var(--text-muted)" }}>
+            Size ที่แนะนำ: {stock.positionSizeTh} · ความเสี่ยง: {stock.riskLevel}
+          </p>
+        </div>
+      )}
     </article>
   );
 }
