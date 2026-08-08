@@ -7,7 +7,7 @@ export type Stock = {
   shortInterest: number;
   daysToCover: number;
   earningsDate: string;
-  earningsTime: "BMO" | "AMC" | "Unknown"; // Before Market Open / After Market Close
+  earningsTime: "BMO" | "AMC" | "Unknown";
   theme: string;
   themeTh: string;
   priority: number;
@@ -17,8 +17,10 @@ export type Stock = {
   notes: string;
   notesTh: string;
   riskLevel: "Low" | "Medium" | "High";
-  positionSize: string; // suggested % of capital
+  positionSize: string;
   positionSizeTh: string;
+  impliedMove: string;       // approximate expected move
+  impliedMoveTh: string;
 };
 
 export const STOCKS: Stock[] = [
@@ -41,6 +43,8 @@ export const STOCKS: Stock[] = [
     riskLevel: "High",
     positionSize: "1-2% of capital",
     positionSizeTh: "1-2% ของทุน",
+    impliedMove: "~18-25%",
+    impliedMoveTh: "ประมาณ 18-25%",
   },
   {
     symbol: "RKLB",
@@ -61,6 +65,8 @@ export const STOCKS: Stock[] = [
     riskLevel: "Medium",
     positionSize: "2-3% of capital",
     positionSizeTh: "2-3% ของทุน",
+    impliedMove: "~12-18%",
+    impliedMoveTh: "ประมาณ 12-18%",
   },
   {
     symbol: "LITE",
@@ -81,6 +87,8 @@ export const STOCKS: Stock[] = [
     riskLevel: "Medium",
     positionSize: "1-2% of capital",
     positionSizeTh: "1-2% ของทุน",
+    impliedMove: "~10-15%",
+    impliedMoveTh: "ประมาณ 10-15%",
   },
   {
     symbol: "CRWV",
@@ -101,6 +109,8 @@ export const STOCKS: Stock[] = [
     riskLevel: "High",
     positionSize: "0.5-1.5% of capital",
     positionSizeTh: "0.5-1.5% ของทุน",
+    impliedMove: "~15-22%",
+    impliedMoveTh: "ประมาณ 15-22%",
   },
   {
     symbol: "SMCI",
@@ -121,6 +131,8 @@ export const STOCKS: Stock[] = [
     riskLevel: "High",
     positionSize: "1% of capital",
     positionSizeTh: "1% ของทุน",
+    impliedMove: "~12-20%",
+    impliedMoveTh: "ประมาณ 12-20%",
   },
   {
     symbol: "COHR",
@@ -141,6 +153,8 @@ export const STOCKS: Stock[] = [
     riskLevel: "Medium",
     positionSize: "1-2% of capital",
     positionSizeTh: "1-2% ของทุน",
+    impliedMove: "~9-14%",
+    impliedMoveTh: "ประมาณ 9-14%",
   },
 ];
 
@@ -202,6 +216,33 @@ export const RISK_RULES = {
     {
       en: "If CPI comes out hot, reduce or avoid new positions in high-beta names.",
       th: "ถ้า CPI ออกมาแรง ให้ลดหรือเลี่ยงเปิด position ใหม่ในหุ้นผันผวนสูง",
+    },
+  ],
+};
+
+export const ENTRY_CHECKLIST = {
+  titleTh: "Checklist ก่อนเข้าเทรด",
+  title: "Entry Checklist",
+  items: [
+    {
+      th: "มี Catalyst ชัดเจน (Earnings / ข่าวใหญ่)",
+      en: "Clear catalyst (Earnings / major news)",
+    },
+    {
+      th: "Relative Volume สูงกว่า 1.5 เท่า (มีแรงซื้อจริง)",
+      en: "Relative Volume > 1.5x (real interest)",
+    },
+    {
+      th: "ราคาเคลื่อนไหวตามทิศทางที่ต้องการหลังข่าว",
+      en: "Price moves in the desired direction after the news",
+    },
+    {
+      th: "ขนาด Position อยู่ในกรอบที่กำหนดไว้",
+      en: "Position size within the planned risk limit",
+    },
+    {
+      th: "รู้จุดตัดขาดทุนล่วงหน้า",
+      en: "Know your stop-loss level in advance",
     },
   ],
 };

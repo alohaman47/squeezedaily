@@ -1,4 +1,4 @@
-import { STOCKS, WEEKLY_PLAN, RISK_RULES } from "@/lib/stocks";
+import { STOCKS, WEEKLY_PLAN, RISK_RULES, ENTRY_CHECKLIST } from "@/lib/stocks";
 import StockCard from "@/components/StockCard";
 import Nav from "@/components/Nav";
 
@@ -7,7 +7,6 @@ export default function Home() {
     <main className="max-w-6xl mx-auto px-4 py-8">
       <Nav />
 
-      {/* Header */}
       <header className="mb-8">
         <h1 className="text-3xl md:text-4xl font-bold tracking-tight text-white">
           SqueezeDaily
@@ -37,19 +36,13 @@ export default function Home() {
             className={`rounded-xl border p-3 text-center ${
               s.signal === "Buy"
                 ? "border-emerald-500/40 bg-emerald-500/10"
-                : s.signal === "Sell"
-                ? "border-rose-500/40 bg-rose-500/10"
                 : "border-amber-500/40 bg-amber-500/10"
             }`}
           >
             <p className="text-xs text-slate-400">{s.symbol}</p>
             <p
               className={`text-lg font-bold ${
-                s.signal === "Buy"
-                  ? "text-emerald-300"
-                  : s.signal === "Sell"
-                  ? "text-rose-300"
-                  : "text-amber-300"
+                s.signal === "Buy" ? "text-emerald-300" : "text-amber-300"
               }`}
             >
               {s.signal}
@@ -103,6 +96,26 @@ export default function Home() {
         </div>
       </section>
 
+      {/* Entry Checklist */}
+      <section className="mb-12">
+        <h2 className="text-xl font-semibold mb-5 text-white">
+          {ENTRY_CHECKLIST.titleTh}
+        </h2>
+        <div className="rounded-2xl border border-slate-800 bg-slate-900/60 p-6 space-y-3">
+          {ENTRY_CHECKLIST.items.map((item, i) => (
+            <div key={i} className="flex gap-3 items-start">
+              <span className="flex-shrink-0 w-6 h-6 rounded-full bg-emerald-500/20 text-emerald-300 text-xs font-bold flex items-center justify-center mt-0.5">
+                {i + 1}
+              </span>
+              <div>
+                <p className="text-slate-200 text-sm">{item.th}</p>
+                <p className="text-slate-500 text-xs">{item.en}</p>
+              </div>
+            </div>
+          ))}
+        </div>
+      </section>
+
       {/* Risk Rules */}
       <section className="mb-12">
         <h2 className="text-xl font-semibold mb-5 text-white">
@@ -123,13 +136,12 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Footer */}
       <footer className="text-center text-slate-600 text-sm pt-8 border-t border-slate-800">
         <p>
-          Data via Finnhub · Short Interest approximate · Not financial advice
+          Data via Finnhub · Implied Move is approximate · Short Interest approximate · Not financial advice
         </p>
         <p className="mt-1">
-          ข้อมูลจาก Finnhub · Short Interest เป็นค่าประมาณ · ไม่ใช่คำแนะนำการลงทุน
+          ข้อมูลจาก Finnhub · Implied Move เป็นค่าประมาณ · ไม่ใช่คำแนะนำการลงทุน
         </p>
       </footer>
     </main>

@@ -23,18 +23,28 @@ export async function GET(req: NextRequest) {
     );
     const quote = await quoteRes.json();
 
-    // Try to get additional candle data for volume (latest daily)
     let volume: number | null = null;
+    let avgVolume: number | null = null;
+    let relativeVolume: number | null = null;
+
     try {
       const to = Math.floor(Date.now() / 1000);
-      const from = to - 60 * 60 * 24 * 5; // last 5 days
+      const from = to - 60 * 60 * 24 * 30; // ~30 days
       const candleRes = await fetch(
         `${FINNHUB}/stock/candle?symbol=${symbol}&resolution=D&from=${from}&to=${to}&token=${key}`,
         { next: { revalidate: 300 } }
       );
       const candle = await candleRes.json();
-      if (candle.s === "ok" && candle.v?.length) {
-        volume = candle.v[candle.v.length - 1];
+
+      if (candle.s === "ok" && candle.v?.length > 1) {
+        const volumes: number[] = candle.v;
+        volume = volumes[volumes.length - 1];
+        // Average of previous days (exclude today)
+        const prev = volumes.slice(0, -1);
+        avgVolume = prev.reduce((a, b) => a + b, 0) / prev.length;
+        if (avgVolume > 0) {
+          relativeVolume = volume / avgVolume;
+        }
       }
     } catch {
       // volume optional
@@ -50,6 +60,8 @@ export async function GET(req: NextRequest) {
       open: quote.o,
       prevClose: quote.pc,
       volume,
+      avgVolume,
+      relativeVolume,
     });
   } catch (e) {
     return NextResponse.json({ error: "Failed to fetch" }, { status: 500 });
