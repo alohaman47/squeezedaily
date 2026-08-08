@@ -6,7 +6,7 @@ export default function Nav() {
       <Link href="/" className="text-xl font-bold text-white hover:text-indigo-300 transition">
         SqueezeDaily
       </Link>
-      <div className="flex gap-4 text-sm">
+      <div className="flex gap-2 text-sm">
         <Link
           href="/"
           className="text-slate-300 hover:text-white transition px-3 py-1.5 rounded-lg hover:bg-slate-800"
@@ -17,7 +17,7 @@ export default function Nav() {
           href="/news"
           className="text-slate-300 hover:text-white transition px-3 py-1.5 rounded-lg hover:bg-slate-800"
         >
-          News
+          News · ข่าว
         </Link>
       </div>
     </nav>
