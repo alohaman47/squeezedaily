@@ -1,5 +1,5 @@
 import { STOCKS, WEEKLY_PLAN, RISK_RULES, ENTRY_CHECKLIST } from "@/lib/stocks";
-import StockCard from "@/components/StockCard";
+import WatchlistSection from "@/components/WatchlistSection";
 import Nav from "@/components/Nav";
 
 export default function Home() {
@@ -76,21 +76,7 @@ export default function Home() {
       </section>
 
       {/* Watchlist */}
-      <section className="mb-14">
-        <div className="flex items-end justify-between mb-5">
-          <h2 className="text-[15px] font-semibold tracking-tight" style={{ color: "var(--text-primary)" }}>
-            Watchlist
-          </h2>
-          <span className="text-[12px]" style={{ color: "var(--text-muted)" }}>
-            {STOCKS.length} names
-          </span>
-        </div>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          {STOCKS.map((s) => (
-            <StockCard key={s.symbol} stock={s} />
-          ))}
-        </div>
-      </section>
+      <WatchlistSection />
 
       {/* Daily Plan */}
       <section className="mb-14">

@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { Stock, Signal } from "@/lib/stocks";
+import type { CardView } from "./ViewToggle";
 
 type Quote = {
   price?: number;
@@ -58,7 +59,6 @@ function SignalBadge({ signal }: { signal: Signal }) {
   );
 }
 
-/** Horizontal bar meter 0-100 */
 function Meter({
   value,
   max = 100,
@@ -83,10 +83,7 @@ function Meter({
           {display}
         </span>
       </div>
-      <div
-        className="h-1.5 rounded-full overflow-hidden"
-        style={{ background: "var(--surface)" }}
-      >
+      <div className="h-1.5 rounded-full overflow-hidden" style={{ background: "var(--surface)" }}>
         <div
           className="h-full rounded-full transition-all duration-700 ease-out"
           style={{
@@ -99,7 +96,6 @@ function Meter({
   );
 }
 
-/** Mini donut for risk */
 function RiskRing({ level }: { level: "Low" | "Medium" | "High" }) {
   const map = {
     Low: { pct: 30, color: "var(--positive)", label: "ต่ำ" },
@@ -114,14 +110,7 @@ function RiskRing({ level }: { level: "Low" | "Medium" | "High" }) {
   return (
     <div className="flex flex-col items-center gap-1">
       <svg width="48" height="48" className="-rotate-90">
-        <circle
-          cx="24"
-          cy="24"
-          r={r}
-          fill="none"
-          stroke="var(--surface)"
-          strokeWidth="4"
-        />
+        <circle cx="24" cy="24" r={r} fill="none" stroke="var(--surface)" strokeWidth="4" />
         <circle
           cx="24"
           cy="24"
@@ -142,7 +131,13 @@ function RiskRing({ level }: { level: "Low" | "Medium" | "High" }) {
   );
 }
 
-export default function StockCard({ stock }: { stock: Stock }) {
+export default function StockCard({
+  stock,
+  view = "visual",
+}: {
+  stock: Stock;
+  view?: CardView;
+}) {
   const [quote, setQuote] = useState<Quote | null>(null);
   const [loading, setLoading] = useState(true);
 
@@ -158,8 +153,9 @@ export default function StockCard({ stock }: { stock: Stock }) {
 
   const isUp = (quote?.percent ?? 0) >= 0;
   const rvol = quote?.relativeVolume ?? 0;
+  const squeezeLabel =
+    stock.shortInterest >= 18 ? "สูงมาก" : stock.shortInterest >= 12 ? "สูง" : "ปานกลาง";
 
-  // Parse implied move midpoint for meter (e.g. "~18-25%" → 21.5)
   const impMatch = stock.impliedMove.match(/(\d+(?:\.\d+)?)/g);
   const impMid =
     impMatch && impMatch.length >= 2
@@ -170,7 +166,7 @@ export default function StockCard({ stock }: { stock: Stock }) {
 
   return (
     <article className="card-premium p-5 flex flex-col h-full">
-      {/* Header */}
+      {/* Header - shared */}
       <div className="flex items-start justify-between gap-3 mb-4">
         <div className="min-w-0">
           <div className="flex items-center gap-2 mb-0.5">
@@ -180,10 +176,7 @@ export default function StockCard({ stock }: { stock: Stock }) {
             >
               {stock.symbol}
             </h3>
-            <span
-              className="text-[10px] font-medium tabular-nums"
-              style={{ color: "var(--text-muted)" }}
-            >
+            <span className="text-[10px] font-medium tabular-nums" style={{ color: "var(--text-muted)" }}>
               #{stock.priority}
             </span>
           </div>
@@ -194,10 +187,7 @@ export default function StockCard({ stock }: { stock: Stock }) {
 
         <div className="text-right shrink-0">
           {loading ? (
-            <div
-              className="h-5 w-16 animate-pulse rounded"
-              style={{ background: "var(--surface)" }}
-            />
+            <div className="h-5 w-16 animate-pulse rounded" style={{ background: "var(--surface)" }} />
           ) : quote?.price ? (
             <>
               <p
@@ -215,53 +205,104 @@ export default function StockCard({ stock }: { stock: Stock }) {
               </p>
             </>
           ) : (
-            <p className="text-[12px]" style={{ color: "var(--text-muted)" }}>
-              —
-            </p>
+            <p className="text-[12px]" style={{ color: "var(--text-muted)" }}>—</p>
           )}
         </div>
       </div>
 
-      {/* Signal + Risk ring */}
-      <div className="flex items-center justify-between mb-4">
-        <SignalBadge signal={stock.signal} />
-        <RiskRing level={stock.riskLevel} />
-      </div>
+      {/* ========== VISUAL MODE ========== */}
+      {view === "visual" && (
+        <>
+          <div className="flex items-center justify-between mb-4">
+            <SignalBadge signal={stock.signal} />
+            <RiskRing level={stock.riskLevel} />
+          </div>
 
-      {/* Reason */}
-      <p
-        className="text-[13px] leading-relaxed mb-5 line-clamp-2"
-        style={{ color: "var(--text-secondary)" }}
-      >
-        {stock.signalReasonTh}
-      </p>
+          <p className="text-[13px] leading-relaxed mb-5 line-clamp-2" style={{ color: "var(--text-secondary)" }}>
+            {stock.signalReasonTh}
+          </p>
 
-      {/* Visual meters instead of table */}
-      <div className="space-y-3.5 mb-5">
-        <Meter
-          label="Short Interest"
-          value={stock.shortInterest}
-          max={30}
-          color="var(--warning)"
-          display={`${stock.shortInterest}%`}
-        />
-        <Meter
-          label="Relative Volume"
-          value={Math.min(rvol, 5)}
-          max={5}
-          color={rvol >= 2 ? "var(--positive)" : rvol >= 1.5 ? "var(--warning)" : "var(--text-muted)"}
-          display={rvol ? `${rvol.toFixed(1)}x` : "—"}
-        />
-        <Meter
-          label="Implied Move"
-          value={impMid}
-          max={30}
-          color="var(--accent)"
-          display={stock.impliedMove}
-        />
-      </div>
+          <div className="space-y-3.5 mb-5">
+            <Meter
+              label="Short Interest"
+              value={stock.shortInterest}
+              max={30}
+              color="var(--warning)"
+              display={`${stock.shortInterest}%`}
+            />
+            <Meter
+              label="Relative Volume"
+              value={Math.min(rvol || 0, 5)}
+              max={5}
+              color={rvol >= 2 ? "var(--positive)" : rvol >= 1.5 ? "var(--warning)" : "var(--text-muted)"}
+              display={rvol ? `${rvol.toFixed(1)}x` : "—"}
+            />
+            <Meter
+              label="Implied Move"
+              value={impMid}
+              max={30}
+              color="var(--accent)"
+              display={stock.impliedMove}
+            />
+          </div>
+        </>
+      )}
 
-      {/* Bottom meta */}
+      {/* ========== CLASSIC MODE ========== */}
+      {view === "classic" && (
+        <>
+          <div className="mb-3">
+            <SignalBadge signal={stock.signal} />
+          </div>
+
+          <p className="text-[13px] leading-relaxed mb-4 line-clamp-2" style={{ color: "var(--text-secondary)" }}>
+            {stock.signalReasonTh}
+          </p>
+
+          <div className="grid grid-cols-3 gap-2 mb-4">
+            {[
+              { label: "Short %", value: `${stock.shortInterest}%`, color: "var(--warning)" },
+              { label: "Squeeze", value: squeezeLabel, color: "var(--negative)" },
+              {
+                label: "RVOL",
+                value: rvol ? `${rvol.toFixed(1)}x` : "—",
+                color: rvol >= 2 ? "var(--positive)" : rvol >= 1.5 ? "var(--warning)" : "var(--text-primary)",
+              },
+              {
+                label: "Earnings",
+                value: `${stock.earningsDate.slice(5)} ${stock.earningsTime}`,
+                color: "var(--text-primary)",
+              },
+              { label: "Imp. Move", value: stock.impliedMove, color: "var(--accent)" },
+              {
+                label: "Risk",
+                value: stock.riskLevel,
+                color:
+                  stock.riskLevel === "High"
+                    ? "var(--negative)"
+                    : stock.riskLevel === "Medium"
+                    ? "var(--warning)"
+                    : "var(--positive)",
+              },
+            ].map((m) => (
+              <div
+                key={m.label}
+                className="rounded-lg px-2.5 py-2"
+                style={{ background: "var(--surface)", border: "1px solid var(--border)" }}
+              >
+                <p className="text-[10px] mb-0.5" style={{ color: "var(--text-muted)" }}>
+                  {m.label}
+                </p>
+                <p className="text-[12px] font-semibold tabular-nums" style={{ color: m.color }}>
+                  {m.value}
+                </p>
+              </div>
+            ))}
+          </div>
+        </>
+      )}
+
+      {/* Footer - shared */}
       <div
         className="mt-auto pt-3 flex items-center justify-between text-[11px]"
         style={{ borderTop: "1px solid var(--border)" }}
@@ -272,9 +313,7 @@ export default function StockCard({ stock }: { stock: Stock }) {
             <span style={{ color: "var(--accent)" }}>{stock.earningsTime}</span>
           </span>
           <span style={{ color: "var(--text-muted)" }}>·</span>
-          <span style={{ color: "var(--text-muted)" }}>
-            DTC {stock.daysToCover}
-          </span>
+          <span style={{ color: "var(--text-muted)" }}>DTC {stock.daysToCover}</span>
         </div>
         <span className="font-medium" style={{ color: "var(--text-primary)" }}>
           {stock.positionSizeTh}
