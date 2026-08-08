@@ -39,25 +39,40 @@ export default function Home() {
         </p>
       </section>
 
-      {/* Quick signals */}
-      <section className="mb-10 grid grid-cols-3 sm:grid-cols-6 gap-2">
-        {STOCKS.map((s) => (
-          <div
-            key={s.symbol}
-            className="rounded-xl px-3 py-3 text-center"
-            style={{ border: "1px solid var(--border)", background: "var(--surface)" }}
-          >
-            <p className="text-[11px] font-medium mb-1" style={{ color: "var(--text-muted)" }}>
-              {s.symbol}
-            </p>
-            <p
-              className="text-[13px] font-semibold"
-              style={{ color: s.signal === "Buy" ? "var(--positive)" : "var(--warning)" }}
+      {/* Quick signals - visual strip */}
+      <section className="mb-10 grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-2.5">
+        {STOCKS.map((s) => {
+          const barPct = Math.min(100, (s.shortInterest / 25) * 100);
+          const barColor = s.signal === "Buy" ? "var(--positive)" : "var(--warning)";
+          return (
+            <div
+              key={s.symbol}
+              className="rounded-xl px-3.5 py-3"
+              style={{ border: "1px solid var(--border)", background: "var(--surface)" }}
             >
-              {s.signal}
-            </p>
-          </div>
-        ))}
+              <div className="flex items-center justify-between mb-2">
+                <span className="text-[12px] font-semibold" style={{ color: "var(--text-primary)" }}>
+                  {s.symbol}
+                </span>
+                <span className="text-[11px] font-semibold" style={{ color: barColor }}>
+                  {s.signal}
+                </span>
+              </div>
+              <div className="h-1 rounded-full overflow-hidden mb-1.5" style={{ background: "var(--border)" }}>
+                <div
+                  className="h-full rounded-full"
+                  style={{
+                    width: `${barPct}%`,
+                    background: `linear-gradient(90deg, ${barColor}66, ${barColor})`,
+                  }}
+                />
+              </div>
+              <p className="text-[10px]" style={{ color: "var(--text-muted)" }}>
+                SI {s.shortInterest}% · {s.earningsTime}
+              </p>
+            </div>
+          );
+        })}
       </section>
 
       {/* Watchlist */}
