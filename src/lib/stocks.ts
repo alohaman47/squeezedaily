@@ -1,3 +1,5 @@
+export type Signal = "Buy" | "Hold" | "Sell";
+
 export type Stock = {
   symbol: string;
   name: string;
@@ -8,6 +10,9 @@ export type Stock = {
   theme: string;
   themeTh: string;
   priority: number;
+  signal: Signal;
+  signalReason: string;
+  signalReasonTh: string;
   notes: string;
   notesTh: string;
 };
@@ -23,6 +28,9 @@ export const STOCKS: Stock[] = [
     theme: "Space / Satellite",
     themeTh: "อวกาศ / ดาวเทียม",
     priority: 1,
+    signal: "Buy",
+    signalReason: "Highest squeeze potential. Enter before or on strong post-earnings reaction.",
+    signalReasonTh: "โอกาส Squeeze สูงสุด เข้าก่อนหรือหลัง earnings ถ้ามีแรงซื้อชัด",
     notes: "Highest squeeze potential. High short interest + earnings Monday.",
     notesTh: "โอกาส Squeeze สูงสุด Short สูง + Earnings จันทร์",
   },
@@ -36,6 +44,9 @@ export const STOCKS: Stock[] = [
     theme: "Space / Launch",
     themeTh: "อวกาศ / จรวด",
     priority: 2,
+    signal: "Buy",
+    signalReason: "Strong space momentum + earnings catalyst. Good risk/reward.",
+    signalReasonTh: "โมเมนตัม Space แรง + มี catalyst จาก earnings",
     notes: "Strong space momentum + earnings. Good catalyst play.",
     notesTh: "โมเมนตัม Space แรง + Earnings ดี",
   },
@@ -49,6 +60,9 @@ export const STOCKS: Stock[] = [
     theme: "AI Optics",
     themeTh: "AI Optics / Photonics",
     priority: 3,
+    signal: "Hold",
+    signalReason: "Wait for earnings reaction. Buy only on strong breakout with volume.",
+    signalReasonTh: "รอ reaction จาก earnings ก่อน ซื้อเฉพาะถ้าทะลุแรงพร้อม volume",
     notes: "AI optics play with strong recent momentum.",
     notesTh: "เล่นธีม AI Optics โมเมนตัมดี",
   },
@@ -62,6 +76,9 @@ export const STOCKS: Stock[] = [
     theme: "AI Cloud",
     themeTh: "AI Cloud Infrastructure",
     priority: 4,
+    signal: "Hold",
+    signalReason: "High short interest but very volatile. Wait for clear post-earnings direction.",
+    signalReasonTh: "Short สูงแต่ผันผวนมาก รอทิศทางชัดหลัง earnings ก่อน",
     notes: "High short + AI cloud. Volatile but high potential.",
     notesTh: "Short สูง + AI Cloud ความผันผวนสูง",
   },

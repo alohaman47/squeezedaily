@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Stock } from "@/lib/stocks";
+import { Stock, Signal } from "@/lib/stocks";
 
 type Quote = {
   price?: number;
@@ -10,6 +10,28 @@ type Quote = {
   error?: string;
   mock?: boolean;
 };
+
+function SignalBadge({ signal }: { signal: Signal }) {
+  const styles = {
+    Buy: "bg-emerald-500/20 text-emerald-300 border-emerald-500/40",
+    Hold: "bg-amber-500/20 text-amber-300 border-amber-500/40",
+    Sell: "bg-rose-500/20 text-rose-300 border-rose-500/40",
+  };
+
+  const labels = {
+    Buy: "BUY",
+    Hold: "HOLD",
+    Sell: "SELL",
+  };
+
+  return (
+    <span
+      className={`text-sm font-bold px-3 py-1 rounded-full border ${styles[signal]}`}
+    >
+      {labels[signal]}
+    </span>
+  );
+}
 
 export default function StockCard({ stock }: { stock: Stock }) {
   const [quote, setQuote] = useState<Quote | null>(null);
@@ -31,6 +53,7 @@ export default function StockCard({ stock }: { stock: Stock }) {
 
   return (
     <div className="rounded-2xl border border-slate-800 bg-slate-900/80 p-5 shadow-lg hover:border-slate-700 transition">
+      {/* Header */}
       <div className="flex items-start justify-between mb-3">
         <div>
           <div className="flex items-center gap-2">
@@ -58,7 +81,17 @@ export default function StockCard({ stock }: { stock: Stock }) {
         </div>
       </div>
 
-      <div className="grid grid-cols-2 gap-3 text-sm mt-4">
+      {/* Signal */}
+      <div className="mb-4 flex items-center gap-3">
+        <SignalBadge signal={stock.signal} />
+        <div className="text-sm">
+          <p className="text-slate-200 font-medium">{stock.signalReasonTh}</p>
+          <p className="text-xs text-slate-500">{stock.signalReason}</p>
+        </div>
+      </div>
+
+      {/* Metrics */}
+      <div className="grid grid-cols-2 gap-3 text-sm">
         <div className="bg-slate-800/50 rounded-lg p-3">
           <p className="text-slate-400 text-xs">Short Interest</p>
           <p className="font-semibold text-amber-300">{stock.shortInterest}%</p>
@@ -78,9 +111,10 @@ export default function StockCard({ stock }: { stock: Stock }) {
       </div>
 
       <div className="mt-4 pt-3 border-t border-slate-800">
-        <p className="text-xs text-slate-400 mb-1">{stock.themeTh} · {stock.theme}</p>
+        <p className="text-xs text-slate-400 mb-1">
+          {stock.themeTh} · {stock.theme}
+        </p>
         <p className="text-sm text-slate-300">{stock.notesTh}</p>
-        <p className="text-xs text-slate-500 mt-1">{stock.notes}</p>
       </div>
     </div>
   );
