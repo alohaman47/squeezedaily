@@ -17,17 +17,23 @@ type NewsItem = {
 export default function NewsPage() {
   const [selected, setSelected] = useState("ASTS");
   const [news, setNews] = useState<NewsItem[]>([]);
+  const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     setLoading(true);
+    setError(null);
     fetch(`/api/news?symbol=${selected}`)
       .then((r) => r.json())
       .then((data) => {
         setNews(data.news || []);
+        if (data.error) setError(data.error);
         setLoading(false);
       })
-      .catch(() => setLoading(false));
+      .catch((err) => {
+        setError(err.message || "Network error");
+        setLoading(false);
+      });
   }, [selected]);
 
   return (
@@ -37,7 +43,7 @@ export default function NewsPage() {
       <header className="mb-8">
         <h1 className="text-3xl font-bold text-white">News · ข่าวล่าสุด</h1>
         <p className="text-slate-400 mt-1">
-          Company news from Finnhub (last 7 days)
+          Company news from Finnhub (last 14 days)
         </p>
       </header>
 
@@ -64,6 +70,15 @@ export default function NewsPage() {
             <div key={i} className="h-28 bg-slate-800/50 animate-pulse rounded-xl" />
           ))}
         </div>
+      ) : error ? (
+        <div className="rounded-xl border border-amber-500/40 bg-amber-500/10 p-5 text-amber-200">
+          <p className="font-medium">ไม่สามารถโหลดข่าวได้</p>
+          <p className="text-sm mt-2 text-amber-300/80">{error}</p>
+          <p className="text-xs mt-3 text-slate-400">
+            ถ้ายังไม่ได้ใส่ API Key → ไปที่ Railway → Variables แล้วเพิ่ม<br/>
+            <code className="text-indigo-300">FINNHUB_API_KEY=d9rjncpr01qoo7o4kgu0d9rjncpr01qoo7o4kgug</code>
+          </p>
+        </div>
       ) : news.length === 0 ? (
         <p className="text-slate-500">No recent news found for {selected}</p>
       ) : (
@@ -76,25 +91,21 @@ export default function NewsPage() {
               rel="noopener noreferrer"
               className="block rounded-xl border border-slate-800 bg-slate-900/60 p-5 hover:border-slate-600 transition"
             >
-              <div className="flex justify-between items-start gap-4">
-                <div className="flex-1">
-                  <h3 className="text-lg font-medium text-white leading-snug">
-                    {item.headline}
-                  </h3>
-                  <p className="text-sm text-slate-400 mt-2 line-clamp-2">
-                    {item.summary}
-                  </p>
-                  <div className="flex items-center gap-3 mt-3 text-xs text-slate-500">
-                    <span>{item.source}</span>
-                    <span>·</span>
-                    <span>
-                      {new Date(item.datetime * 1000).toLocaleString("th-TH", {
-                        dateStyle: "medium",
-                        timeStyle: "short",
-                      })}
-                    </span>
-                  </div>
-                </div>
+              <h3 className="text-lg font-medium text-white leading-snug">
+                {item.headline}
+              </h3>
+              <p className="text-sm text-slate-400 mt-2 line-clamp-2">
+                {item.summary}
+              </p>
+              <div className="flex items-center gap-3 mt-3 text-xs text-slate-500">
+                <span>{item.source}</span>
+                <span>·</span>
+                <span>
+                  {new Date(item.datetime * 1000).toLocaleString("th-TH", {
+                    dateStyle: "medium",
+                    timeStyle: "short",
+                  })}
+                </span>
               </div>
             </a>
           ))}
