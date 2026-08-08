@@ -17,17 +17,28 @@ export async function GET(req: NextRequest) {
   }
 
   try {
-    const [quoteRes, profileRes] = await Promise.all([
-      fetch(`${FINNHUB}/quote?symbol=${symbol}&token=${key}`, {
-        next: { revalidate: 30 },
-      }),
-      fetch(`${FINNHUB}/stock/profile2?symbol=${symbol}&token=${key}`, {
-        next: { revalidate: 3600 },
-      }),
-    ]);
-
+    const quoteRes = await fetch(
+      `${FINNHUB}/quote?symbol=${symbol}&token=${key}`,
+      { next: { revalidate: 30 } }
+    );
     const quote = await quoteRes.json();
-    const profile = await profileRes.json();
+
+    // Try to get additional candle data for volume (latest daily)
+    let volume: number | null = null;
+    try {
+      const to = Math.floor(Date.now() / 1000);
+      const from = to - 60 * 60 * 24 * 5; // last 5 days
+      const candleRes = await fetch(
+        `${FINNHUB}/stock/candle?symbol=${symbol}&resolution=D&from=${from}&to=${to}&token=${key}`,
+        { next: { revalidate: 300 } }
+      );
+      const candle = await candleRes.json();
+      if (candle.s === "ok" && candle.v?.length) {
+        volume = candle.v[candle.v.length - 1];
+      }
+    } catch {
+      // volume optional
+    }
 
     return NextResponse.json({
       symbol,
@@ -38,8 +49,7 @@ export async function GET(req: NextRequest) {
       low: quote.l,
       open: quote.o,
       prevClose: quote.pc,
-      name: profile.name || symbol,
-      logo: profile.logo,
+      volume,
     });
   } catch (e) {
     return NextResponse.json({ error: "Failed to fetch" }, { status: 500 });
