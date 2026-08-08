@@ -41,16 +41,15 @@ export default function NewsPage() {
   }, [selected]);
 
   return (
-    <main className="max-w-6xl mx-auto px-4 py-8">
+    <main className="max-w-3xl mx-auto px-4 py-8">
       <Nav />
 
       <header className="mb-8">
-        <h1 className="text-3xl font-bold text-white">News · ข่าวล่าสุด</h1>
-        <p className="text-slate-400 mt-1">
-          ข่าวบริษัทจาก Finnhub (14 วันล่าสุด) · แปลไทยอัตโนมัติ
-        </p>
-        <p className="text-xs text-slate-500 mt-1">
-          อ่านสรุปในแอปอย่างเดียว ไม่เปิดลิงก์ภายนอก
+        <h1 className="text-2xl md:text-3xl font-bold text-white">
+          News · ข่าวล่าสุด
+        </h1>
+        <p className="text-slate-400 mt-1 text-sm">
+          แปลไทยอัตโนมัติ · อ่านสรุปในแอป
         </p>
       </header>
 
@@ -60,10 +59,10 @@ export default function NewsPage() {
           <button
             key={s.symbol}
             onClick={() => setSelected(s.symbol)}
-            className={`px-4 py-2 rounded-full text-sm font-medium transition ${
+            className={`px-3.5 py-1.5 rounded-full text-sm font-medium transition ${
               selected === s.symbol
-                ? "bg-indigo-600 text-white"
-                : "bg-slate-800 text-slate-300 hover:bg-slate-700"
+                ? "bg-indigo-600 text-white shadow-lg shadow-indigo-900/40"
+                : "bg-slate-800/80 text-slate-400 hover:bg-slate-700 hover:text-slate-200"
             }`}
           >
             {s.symbol}
@@ -73,73 +72,97 @@ export default function NewsPage() {
 
       {loading ? (
         <div className="space-y-4">
-          {[1, 2, 3].map((i) => (
-            <div key={i} className="h-32 bg-slate-800/50 animate-pulse rounded-xl" />
+          {[1, 2, 3, 4].map((i) => (
+            <div
+              key={i}
+              className="h-28 bg-slate-800/40 animate-pulse rounded-2xl"
+            />
           ))}
-          <p className="text-sm text-slate-500 text-center">กำลังแปลข่าวเป็นภาษาไทย...</p>
-        </div>
-      ) : error ? (
-        <div className="rounded-xl border border-amber-500/40 bg-amber-500/10 p-5 text-amber-200">
-          <p className="font-medium">ไม่สามารถโหลดข่าวได้</p>
-          <p className="text-sm mt-2 text-amber-300/80">{error}</p>
-          <p className="text-xs mt-3 text-slate-400">
-            ถ้ายังไม่ได้ใส่ API Key → ไปที่ Railway → Variables แล้วเพิ่ม<br />
-            <code className="text-indigo-300">
-              FINNHUB_API_KEY=d9rjncpr01qoo7o4kgu0d9rjncpr01qoo7o4kgug
-            </code>
+          <p className="text-sm text-slate-500 text-center pt-2">
+            กำลังโหลดและแปลข่าว...
           </p>
         </div>
+      ) : error ? (
+        <div className="rounded-2xl border border-amber-500/30 bg-amber-500/5 p-6 text-amber-200">
+          <p className="font-medium">ไม่สามารถโหลดข่าวได้</p>
+          <p className="text-sm mt-2 text-amber-300/70">{error}</p>
+        </div>
       ) : news.length === 0 ? (
-        <p className="text-slate-500">ไม่พบข่าวล่าสุดของ {selected}</p>
+        <div className="text-center py-16 text-slate-500">
+          <p>ไม่พบข่าวล่าสุดของ {selected}</p>
+        </div>
       ) : (
-        <div className="space-y-4">
+        <div className="space-y-3">
           {news.map((item) => {
             const isOpen = expanded === item.id;
+            const hasThai =
+              item.headlineTh && item.headlineTh !== item.headline;
+
             return (
-              <div
+              <article
                 key={item.id}
                 onClick={() => setExpanded(isOpen ? null : item.id)}
-                className="rounded-xl border border-slate-800 bg-slate-900/60 p-5 cursor-pointer hover:border-slate-600 transition"
+                className={`
+                  group rounded-2xl border p-5 cursor-pointer transition-all duration-200
+                  ${
+                    isOpen
+                      ? "border-indigo-500/40 bg-slate-900 shadow-lg shadow-indigo-950/20"
+                      : "border-slate-800/80 bg-slate-900/50 hover:border-slate-700 hover:bg-slate-900/80"
+                  }
+                `}
               >
-                {/* Thai headline */}
-                <h3 className="text-lg font-medium text-white leading-snug">
-                  {item.headlineTh || item.headline}
-                </h3>
+                {/* Meta row */}
+                <div className="flex items-center gap-2 mb-2.5 text-xs">
+                  <span className="px-2 py-0.5 rounded-md bg-slate-800 text-slate-400 font-medium">
+                    {item.source}
+                  </span>
+                  <span className="text-slate-600">·</span>
+                  <time className="text-slate-500">
+                    {new Date(item.datetime * 1000).toLocaleString("th-TH", {
+                      day: "numeric",
+                      month: "short",
+                      hour: "2-digit",
+                      minute: "2-digit",
+                    })}
+                  </time>
+                </div>
 
-                {/* English headline */}
-                {item.headlineTh && item.headlineTh !== item.headline && (
-                  <p className="text-sm text-slate-500 mt-1 leading-snug">
+                {/* Headline Thai */}
+                <h2 className="text-[17px] font-semibold text-white leading-snug tracking-tight">
+                  {item.headlineTh || item.headline}
+                </h2>
+
+                {/* Headline English (smaller) */}
+                {hasThai && (
+                  <p className="text-[13px] text-slate-500 mt-1.5 leading-snug">
                     {item.headline}
                   </p>
                 )}
 
-                {/* Summary - show more when expanded */}
+                {/* Summary */}
                 {(item.summaryTh || item.summary) && (
-                  <p
-                    className={`text-sm text-slate-300 mt-3 ${
-                      isOpen ? "" : "line-clamp-2"
-                    }`}
+                  <div
+                    className={`
+                      mt-3 text-[14px] text-slate-300 leading-relaxed
+                      ${isOpen ? "" : "line-clamp-2"}
+                    `}
                   >
                     {item.summaryTh || item.summary}
-                  </p>
+                  </div>
                 )}
 
-                <div className="flex items-center justify-between mt-3">
-                  <div className="flex items-center gap-3 text-xs text-slate-500">
-                    <span>{item.source}</span>
-                    <span>·</span>
-                    <span>
-                      {new Date(item.datetime * 1000).toLocaleString("th-TH", {
-                        dateStyle: "medium",
-                        timeStyle: "short",
-                      })}
-                    </span>
-                  </div>
-                  <span className="text-xs text-indigo-400">
+                {/* Expand hint */}
+                <div className="mt-3 flex justify-end">
+                  <span
+                    className={`
+                      text-xs font-medium transition
+                      ${isOpen ? "text-indigo-400" : "text-slate-600 group-hover:text-slate-400"}
+                    `}
+                  >
                     {isOpen ? "ย่อ ▲" : "อ่านเพิ่ม ▼"}
                   </span>
                 </div>
-              </div>
+              </article>
             );
           })}
         </div>
