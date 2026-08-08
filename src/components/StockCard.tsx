@@ -127,14 +127,17 @@ function RiskRing({ level }: { level: "Low" | "Medium" | "High" }) {
   );
 }
 
-function PlanRow({ title, body }: { title: string; body: string }) {
+function PlanRow({ title, bodyTh, bodyEn }: { title: string; bodyTh: string; bodyEn: string }) {
   return (
     <div className="space-y-1">
       <p className="text-[11px] font-semibold tracking-wide uppercase" style={{ color: "var(--accent)" }}>
         {title}
       </p>
-      <p className="text-[13px] leading-relaxed" style={{ color: "var(--text-secondary)" }}>
-        {body}
+      <p className="text-[13px] leading-relaxed" style={{ color: "var(--text-primary)" }}>
+        {bodyTh}
+      </p>
+      <p className="text-[11px] leading-relaxed" style={{ color: "var(--text-muted)" }}>
+        {bodyEn}
       </p>
     </div>
   );
@@ -179,7 +182,6 @@ export default function StockCard({
       className="card-premium p-5 flex flex-col h-full cursor-pointer"
       onClick={() => setOpen((v) => !v)}
     >
-      {/* Header */}
       <div className="flex items-start justify-between gap-3 mb-4">
         <div className="min-w-0">
           <div className="flex items-center gap-2 mb-0.5">
@@ -217,7 +219,6 @@ export default function StockCard({
         </div>
       </div>
 
-      {/* Visual mode */}
       {view === "visual" && (
         <>
           <div className="flex items-center justify-between mb-4">
@@ -241,7 +242,6 @@ export default function StockCard({
         </>
       )}
 
-      {/* Classic mode */}
       {view === "classic" && (
         <>
           <div className="mb-3">
@@ -293,7 +293,6 @@ export default function StockCard({
         </>
       )}
 
-      {/* Footer */}
       <div
         className="mt-auto pt-3 flex items-center justify-between text-[11px]"
         style={{ borderTop: "1px solid var(--border)" }}
@@ -311,31 +310,44 @@ export default function StockCard({
         </span>
       </div>
 
-      {/* Expanded Trade Plan */}
       {open && (
         <div
           className="mt-4 pt-4 space-y-4"
           style={{ borderTop: "1px solid var(--border)" }}
           onClick={(e) => e.stopPropagation()}
         >
-          <p className="text-[12px] font-semibold tracking-wide uppercase" style={{ color: "var(--text-primary)" }}>
-            แผนเทรด · {stock.symbol}
-          </p>
+          <div className="flex items-center justify-between">
+            <p className="text-[12px] font-semibold tracking-wide uppercase" style={{ color: "var(--text-primary)" }}>
+              แผนเทรด · {stock.symbol}
+            </p>
+            <span
+              className="text-[10px] px-2 py-0.5 rounded-md font-medium"
+              style={{
+                background: stock.signal === "Buy" ? "rgba(52,211,153,0.12)" : "rgba(251,191,36,0.12)",
+                color: stock.signal === "Buy" ? "var(--positive)" : "var(--warning)",
+              }}
+            >
+              {stock.signal}
+            </span>
+          </div>
 
-          <PlanRow title="ก่อน Earnings" body={stock.plan.preEarningsTh} />
-          <PlanRow title="หลัง Earnings" body={stock.plan.postEarningsTh} />
-          <PlanRow title="จุดตัดขาดทุน (Stop)" body={stock.plan.stopTh} />
-          <PlanRow title="เป้าทำกำไร (Take Profit)" body={stock.plan.takeProfitTh} />
+          <PlanRow title="ก่อน Earnings" bodyTh={stock.plan.preEarningsTh} bodyEn={stock.plan.preEarnings} />
+          <PlanRow title="หลัง Earnings" bodyTh={stock.plan.postEarningsTh} bodyEn={stock.plan.postEarnings} />
+          <PlanRow title="จุดตัดขาดทุน (Stop)" bodyTh={stock.plan.stopTh} bodyEn={stock.plan.stop} />
+          <PlanRow title="เป้าทำกำไร (Take Profit)" bodyTh={stock.plan.takeProfitTh} bodyEn={stock.plan.takeProfit} />
 
           <div
             className="rounded-xl px-3 py-2.5 text-[12px]"
             style={{ background: "var(--accent-soft)", color: "var(--text-secondary)" }}
           >
-            {stock.plan.notesTh}
+            <p>{stock.plan.notesTh}</p>
+            <p className="text-[11px] mt-1" style={{ color: "var(--text-muted)" }}>
+              {stock.plan.notes}
+            </p>
           </div>
 
           <p className="text-[11px]" style={{ color: "var(--text-muted)" }}>
-            Size ที่แนะนำ: {stock.positionSizeTh} · ความเสี่ยง: {stock.riskLevel}
+            Size ที่แนะนำ: {stock.positionSizeTh} · ความเสี่ยง: {stock.riskLevel} · ไม่ใช่คำแนะนำการลงทุน
           </p>
         </div>
       )}
