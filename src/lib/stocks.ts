@@ -4,7 +4,7 @@ export type Stock = {
   symbol: string;
   name: string;
   nameTh: string;
-  shortInterest: number; // % of float
+  shortInterest: number;
   daysToCover: number;
   earningsDate: string;
   theme: string;
@@ -82,6 +82,38 @@ export const STOCKS: Stock[] = [
     notes: "High short + AI cloud. Volatile but high potential.",
     notesTh: "Short สูง + AI Cloud ความผันผวนสูง",
   },
+  {
+    symbol: "SMCI",
+    name: "Super Micro Computer",
+    nameTh: "Super Micro Computer",
+    shortInterest: 14.2,
+    daysToCover: 1.8,
+    earningsDate: "2026-08-11",
+    theme: "AI Server",
+    themeTh: "AI Server / Hardware",
+    priority: 5,
+    signal: "Hold",
+    signalReason: "AI server name with earnings. Watch reaction carefully, high volatility.",
+    signalReasonTh: "หุ้น AI Server มี earnings ระวังความผันผวน ดู reaction ก่อน",
+    notes: "AI infrastructure hardware. Earnings Tuesday.",
+    notesTh: "ฮาร์ดแวร์ AI มี earnings วันอังคาร",
+  },
+  {
+    symbol: "COHR",
+    name: "Coherent",
+    nameTh: "Coherent",
+    shortInterest: 9.8,
+    daysToCover: 2.1,
+    earningsDate: "2026-08-12",
+    theme: "AI Photonics",
+    themeTh: "AI Photonics / Optics",
+    priority: 6,
+    signal: "Hold",
+    signalReason: "Optics / photonics name. Better to wait for CPI + earnings reaction.",
+    signalReasonTh: "กลุ่ม Optics รอ CPI และ earnings reaction ก่อนตัดสินใจ",
+    notes: "Related to AI optics theme. Earnings around CPI day.",
+    notesTh: "เกี่ยวข้องธีม AI Optics รายงานใกล้วัน CPI",
+  },
 ];
 
 export const WEEKLY_PLAN = {
@@ -98,14 +130,14 @@ export const WEEKLY_PLAN = {
     {
       day: "Tuesday 11 Aug",
       dayTh: "อังคาร 11 ส.ค.",
-      focus: ["LITE", "CRWV"],
-      note: "Watch Monday reaction. LITE momentum, CRWV volatile.",
-      noteTh: "ดู reaction จากจันทร์ LITE เล่น momentum, CRWV ผันผวน",
+      focus: ["LITE", "CRWV", "SMCI"],
+      note: "Watch Monday reaction. Multiple AI + optics names report.",
+      noteTh: "ดู reaction จากจันทร์ มีหลายตัวในกลุ่ม AI รายงาน",
     },
     {
       day: "Wednesday 12 Aug",
       dayTh: "พุธ 12 ส.ค.",
-      focus: ["CPI Reaction"],
+      focus: ["CPI", "COHR"],
       note: "CPI day – wait for the number before new positions.",
       noteTh: "วัน CPI รอตัวเลขก่อนเปิด position ใหม่",
     },

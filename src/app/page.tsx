@@ -1,34 +1,66 @@
 import { STOCKS, WEEKLY_PLAN } from "@/lib/stocks";
 import StockCard from "@/components/StockCard";
+import Nav from "@/components/Nav";
 
 export default function Home() {
   return (
     <main className="max-w-6xl mx-auto px-4 py-8">
+      <Nav />
+
       {/* Header */}
-      <header className="mb-10">
+      <header className="mb-8">
         <h1 className="text-3xl md:text-4xl font-bold tracking-tight text-white">
           SqueezeDaily
         </h1>
         <p className="mt-2 text-slate-400">
-          Short Squeeze + Daily / Weekly Trade Plan · ASTS · RKLB · LITE · CRWV
+          Short Squeeze + Daily / Weekly Trade Plan
         </p>
         <p className="text-sm text-slate-500 mt-1">
-          แผนเทรดรายวัน-รายสัปดาห์ + โอกาส Short Squeeze (ข้อมูลอัปเดต Aug 2026)
+          แผนเทรดรายวัน-รายสัปดาห์ + โอกาส Short Squeeze · อัปเดต Aug 2026
         </p>
       </header>
 
       {/* Weekly Theme */}
-      <section className="mb-10 rounded-2xl bg-gradient-to-r from-indigo-900/40 to-slate-900 border border-indigo-800/50 p-6">
-        <h2 className="text-lg font-semibold text-indigo-300 mb-1">
+      <section className="mb-10 rounded-2xl bg-gradient-to-r from-indigo-900/50 to-slate-900 border border-indigo-700/40 p-6">
+        <h2 className="text-sm font-medium text-indigo-300 mb-1 uppercase tracking-wide">
           Weekly Theme · ธีมสัปดาห์นี้
         </h2>
-        <p className="text-xl font-medium text-white">{WEEKLY_PLAN.themeTh}</p>
-        <p className="text-slate-400 text-sm">{WEEKLY_PLAN.theme}</p>
+        <p className="text-xl font-semibold text-white">{WEEKLY_PLAN.themeTh}</p>
+        <p className="text-slate-400 text-sm mt-1">{WEEKLY_PLAN.theme}</p>
+      </section>
+
+      {/* Signal Summary */}
+      <section className="mb-8 grid grid-cols-2 md:grid-cols-4 gap-3">
+        {STOCKS.map((s) => (
+          <div
+            key={s.symbol}
+            className={`rounded-xl border p-3 text-center ${
+              s.signal === "Buy"
+                ? "border-emerald-500/40 bg-emerald-500/10"
+                : s.signal === "Sell"
+                ? "border-rose-500/40 bg-rose-500/10"
+                : "border-amber-500/40 bg-amber-500/10"
+            }`}
+          >
+            <p className="text-xs text-slate-400">{s.symbol}</p>
+            <p
+              className={`text-lg font-bold ${
+                s.signal === "Buy"
+                  ? "text-emerald-300"
+                  : s.signal === "Sell"
+                  ? "text-rose-300"
+                  : "text-amber-300"
+              }`}
+            >
+              {s.signal}
+            </p>
+          </div>
+        ))}
       </section>
 
       {/* Stock Cards */}
       <section className="mb-12">
-        <h2 className="text-xl font-semibold mb-4 text-white">
+        <h2 className="text-xl font-semibold mb-5 text-white">
           Watchlist · หุ้นที่โฟกัส
         </h2>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
@@ -40,7 +72,7 @@ export default function Home() {
 
       {/* Daily Plan */}
       <section className="mb-12">
-        <h2 className="text-xl font-semibold mb-4 text-white">
+        <h2 className="text-xl font-semibold mb-5 text-white">
           Daily Plan · แผนรายวัน
         </h2>
         <div className="space-y-4">
@@ -56,7 +88,7 @@ export default function Home() {
                   {d.focus.map((f) => (
                     <span
                       key={f}
-                      className="text-xs px-2 py-1 rounded-full bg-emerald-500/20 text-emerald-300"
+                      className="text-xs px-2.5 py-1 rounded-full bg-emerald-500/15 text-emerald-300 border border-emerald-500/30"
                     >
                       {f}
                     </span>
@@ -73,10 +105,10 @@ export default function Home() {
       {/* Footer */}
       <footer className="text-center text-slate-600 text-sm pt-8 border-t border-slate-800">
         <p>
-          Data via Finnhub · Short Interest is approximate (manual update) · Not financial advice
+          Data via Finnhub · Short Interest approximate · Not financial advice
         </p>
         <p className="mt-1">
-          ข้อมูลราคาจาก Finnhub · Short Interest เป็นค่าประมาณ · ไม่ใช่คำแนะนำการลงทุน
+          ข้อมูลจาก Finnhub · Short Interest เป็นค่าประมาณ · ไม่ใช่คำแนะนำการลงทุน
         </p>
       </footer>
     </main>
